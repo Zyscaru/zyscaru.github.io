@@ -1966,6 +1966,84 @@ window.addEventListener("resize", ()=>{
 </script>
 
 <script>
+/* Navegação comum do Código em Jogo:
+   - nos jogos: botão "← (lista)" dentro da missão e o "voltar" do celular volta para a lista de missões;
+   - nos cursos: o "voltar" do celular volta para o mapa do curso;
+   - na lista e no mapa: link "← Código em Jogo" para a plataforma. */
+(function(){
+  var css = document.createElement("style");
+  css.textContent = ".cj-voltar{display:inline-flex;align-items:center;gap:6px;margin:0 0 12px;padding:6px 14px 6px 10px;border-radius:99px;border:1.5px solid currentColor;background:transparent;color:inherit;font:inherit;font-weight:700;font-size:.86rem;line-height:1.2;cursor:pointer;opacity:.8;min-height:36px}" +
+    ".cj-voltar:hover,.cj-voltar:focus-visible{opacity:1}" +
+    ".cj-portal{display:inline-flex;align-items:center;gap:6px;margin:0 0 12px;font-weight:700;font-size:.88rem;color:inherit;opacity:.75;text-decoration:none}" +
+    ".cj-portal:hover,.cj-portal:focus-visible{opacity:1;text-decoration:underline}";
+  document.head.appendChild(css);
+  var PORTAL = "/";
+  function linkPortal(){ var a = document.createElement("a"); a.className = "cj-portal"; a.href = PORTAL; a.textContent = "← Código em Jogo"; return a; }
+
+  /* ---------- jogos ---------- */
+  if (typeof openLevel === "function" && typeof showLevels === "function"){
+    var btn = document.getElementById("levelsBtn");
+    var rotulo = btn ? btn.textContent.trim() : "Missões";
+    var abrir = openLevel, lista = showLevels;
+    var naMissao = false, voltando = false;
+    try { history.replaceState({ cj: "lista" }, ""); } catch (e){}
+    var poeBotao = function(){
+      var m = document.getElementById("mission");
+      if (!m || m.querySelector(".cj-voltar")) return;
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "cj-voltar"; b.textContent = "← " + rotulo;
+      b.setAttribute("aria-label", "Voltar para a lista de " + rotulo.toLowerCase());
+      b.onclick = function(){ showLevels(); };
+      m.insertBefore(b, m.firstChild);
+    };
+    var poePortal = function(){
+      var v = document.getElementById("view");
+      if (v && !v.querySelector(".cj-portal")) v.insertBefore(linkPortal(), v.firstChild);
+    };
+    var entrou = function(){
+      if (!document.getElementById("mission")) return;
+      if (!naMissao){ try { history.pushState({ cj: "missao" }, ""); } catch (e){} naMissao = true; }
+      poeBotao();
+    };
+    openLevel = function(){ var r = abrir.apply(this, arguments); entrou(); return r; };
+    showLevels = function(){
+      var r = lista.apply(this, arguments);
+      if (naMissao && !voltando){ naMissao = false; try { history.back(); } catch (e){} }
+      naMissao = false;
+      poePortal();
+      return r;
+    };
+    window.addEventListener("popstate", function(){
+      if (naMissao){ voltando = true; naMissao = false; try { showLevels(); } finally { voltando = false; } }
+    });
+    if (document.getElementById("mission")) entrou(); else poePortal();
+    return;
+  }
+
+  /* ---------- cursos ---------- */
+  if (typeof openItem === "function"){
+    var abrirItem = openItem;
+    var noItem = false, voltandoItem = false;
+    try { history.replaceState({ cj: "mapa" }, ""); } catch (e){}
+    var mapa = function(){
+      var l = document.getElementById("lesson");
+      if (l && !l.querySelector(".cj-portal")) l.insertBefore(linkPortal(), l.firstChild);
+    };
+    var depois = function(i){
+      if (i === -1){
+        if (noItem && !voltandoItem){ noItem = false; try { history.back(); } catch (e){} }
+        noItem = false; mapa();
+      } else if (!noItem){ try { history.pushState({ cj: "item" }, ""); } catch (e){} noItem = true; }
+    };
+    openItem = function(i){ var r = abrirItem.apply(this, arguments); depois(i); return r; };
+    window.addEventListener("popstate", function(){
+      if (noItem){ voltandoItem = true; noItem = false; try { openItem(-1); } finally { voltandoItem = false; } }
+    });
+    if (typeof current !== "undefined" && current !== -1) depois(current); else mapa();
+  }
+})();
+</script>
+<script>
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
 }

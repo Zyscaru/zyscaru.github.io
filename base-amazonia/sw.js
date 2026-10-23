@@ -1,6 +1,6 @@
 /* Guarda o app no aparelho para funcionar sem internet.
    Ao publicar uma atualização, aumente o número da VERSAO. */
-const VERSAO = "amazonia-v1";
+const VERSAO = "amazonia-v2";
 const ARQUIVOS = [
   "./",
   "index.html",

@@ -1,6 +1,6 @@
 /* Guarda o app no aparelho para funcionar sem internet.
    Ao publicar uma atualização, aumente o número da VERSAO. */
-const VERSAO = "aeroporto-v1";
+const VERSAO = "aeroporto-v2";
 const ARQUIVOS = [
   "./",
   "index.html",
