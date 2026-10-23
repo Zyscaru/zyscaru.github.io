@@ -1,7 +1,7 @@
 {
   "name": "Código em Jogo",
   "short_name": "Código em Jogo",
-  "description": "Plataforma para aprender Python e Java jogando: dois cursos do zero e seis jogos do iniciante ao avançado.",
+  "description": "Plataforma para aprender Python, Java, JavaScript e SQL jogando: quatro cursos do zero e doze jogos do iniciante ao avançado.",
   "lang": "pt-BR",
   "start_url": "./",
   "scope": "./",
