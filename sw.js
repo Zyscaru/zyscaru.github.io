@@ -1,5 +1,5 @@
 /* Guarda só a página inicial da plataforma. Os apps das subpastas têm o próprio cache. */
-const VERSAO = "portal-v2";
+const VERSAO = "portal-v3";
 const ARQUIVOS = ["./", "index.html", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/maskable-512.png", "icons/apple-touch-icon.png", "icons/favicon.png"];
 const PROPRIOS = new Set(ARQUIVOS.map(a => new URL(a, self.registration.scope).href));
 self.addEventListener("install", e => { e.waitUntil(caches.open(VERSAO).then(c => c.addAll(ARQUIVOS)).then(() => self.skipWaiting())); });

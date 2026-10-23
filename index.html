@@ -21,7 +21,7 @@ img{max-width:100%}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Lexend:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
-/* Layout: mapa de três trilhas lado a lado (Python, Java e JavaScript), cada uma com quatro paradas do zero ao avançado; em telas menores, empilhadas. */
+/* Layout: abas por linguagem (Python, Java, JavaScript); a trilha escolhida aparece como um caminho de quatro paradas, na horizontal no computador e na vertical no celular. */
 :root{
   --bg:#f3f1ec; --surface:#fffdf8; --surface-2:#ece8df; --ink:#1d1b26; --ink-soft:#5f5a6b; --line:#d9d3c7;
   --py:#2f6fdb; --py-soft:#dfe9fb; --jv:#d9622b; --jv-soft:#fbe6da; --js:#8f7400; --js-soft:#f6edc4; --js-ink:#fff; --gold:#c4900f; --ok:#2f8a4e;
@@ -70,12 +70,22 @@ a{color:inherit}
 .continuar:hover{border-color:var(--ink-soft)}
 
 /* trilhas */
-.trilhas{margin-top:36px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+.abas{margin-top:40px;display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.abas::-webkit-scrollbar{display:none}
+.aba{--c:var(--py);flex:0 0 auto;background:none;border:0;border-bottom:4px solid transparent;margin-bottom:-1px;padding:10px 18px 12px;cursor:pointer;color:var(--ink-soft);text-align:left;display:flex;flex-direction:column;gap:2px;font:inherit}
+.aba.java{--c:var(--jv)} .aba.javascript{--c:var(--js)}
+.aba b{font-family:var(--f-display);font-weight:700;font-size:1.1rem;letter-spacing:-.01em}
+.aba small{font-family:var(--f-mono);font-size:.74rem}
+.aba:hover{color:var(--ink)}
+.aba[aria-selected="true"]{color:var(--c);border-bottom-color:var(--c)}
+.aba[aria-selected="true"] small{color:var(--ink-soft)}
+.trilhas{margin-top:22px}
 .trilha{--c:var(--py);--soft:var(--py-soft)}
 .trilha.java{--c:var(--jv);--soft:var(--jv-soft)}
 .trilha.javascript{--c:var(--js);--soft:var(--js-soft)}
 .trilha.javascript .btn:not(.sec){color:var(--js-ink)}
-.trilha header{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.trilha header{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.trilha header p{margin:0;color:var(--ink-soft);font-size:.95rem;max-width:62ch}
 .trilha h2{font-family:var(--f-display);font-weight:800;font-size:1.6rem;margin:0;color:var(--c);letter-spacing:-.01em}
 .trilha header span{font-size:.86rem;color:var(--ink-soft)}
 .paradas{list-style:none;margin:0;padding:0;position:relative;display:flex;flex-direction:column;gap:14px}
@@ -105,12 +115,15 @@ a{color:inherit}
 .rodape h4{margin:0 0 6px;font-family:var(--f-display);font-weight:700;font-size:.95rem}
 .rodape p{margin:0;font-size:.88rem;color:var(--ink-soft)}
 
-@media (max-width:1100px){
-  .trilhas{grid-template-columns:minmax(0,1fr);max-width:720px}
+@media (min-width:900px){
+  .paradas{flex-direction:row;gap:18px;align-items:stretch}
+  .paradas::before{left:12.5%;right:12.5%;top:31px;bottom:auto;width:auto;height:4px;background:repeating-linear-gradient(90deg,var(--c) 0 10px,transparent 10px 18px)}
+  .parada{flex:1 1 0;grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr;justify-items:center;gap:12px}
+  .parada .card{width:100%;height:100%}
+  .parada .card .linha{margin-top:auto}
 }
 @media (max-width:860px){
   .hero{grid-template-columns:minmax(0,1fr)}
-  .trilhas{grid-template-columns:minmax(0,1fr)}
   .rodape{grid-template-columns:minmax(0,1fr)}
 }
 @media (max-width:420px){
@@ -118,6 +131,9 @@ a{color:inherit}
   .marco{width:52px} .marco img{width:46px;height:46px;border-radius:12px}
   .paradas::before{left:24px}
   .logo b{font-size:1.2rem}
+  .aba{padding:10px 11px 12px;flex:1 1 0}
+  .aba b{font-size:.98rem}
+  .aba small{font-size:.68rem}
 }
 @media (prefers-reduced-motion:reduce){.barra i{transition:none}}
 </style>
@@ -142,7 +158,8 @@ a{color:inherit}
     <a class="continuar" id="continuar" href="#trilhas"></a>
   </section>
 
-  <section class="trilhas" id="trilhas"></section>
+  <div class="abas" role="tablist" aria-label="Escolher linguagem" id="abas"></div>
+  <section class="trilhas" id="trilhas" role="tabpanel"></section>
 
   <section class="rodape">
     <div><h4>Seu progresso fica aqui</h4><p>Cada app guarda as lições e estrelas neste aparelho, e esta página junta tudo. Use sempre o mesmo navegador para não perder nada.</p></div>
@@ -200,11 +217,26 @@ function render(){
     cont.onclick = () => gravar("cg:ultimo", "caderno-python");
   }
 
-  const NOMES = { python: "Trilha Python", java: "Trilha Java", javascript: "Trilha JavaScript" };
-  document.getElementById("trilhas").innerHTML = ["python", "java", "javascript"].map(t => {
+  const NOMES = { python: "Python", java: "Java", javascript: "JavaScript" };
+  const RESUMO = {
+    python: "A linguagem mais usada para começar: leitura fácil, ótima para automação, dados e inteligência artificial.",
+    java: "Muito pedida em vagas: tipos, classes e coleções, a base de sistemas grandes e do Android.",
+    javascript: "A linguagem da web: roda em todo navegador e dá vida a sites, apps e servidores.",
+  };
+  const TRILHAS = ["python", "java", "javascript"];
+  const pctTrilha = t => { const apps = APPS.filter(a => a.trilha === t); return Math.round(apps.reduce((s, a) => s + P[a.id].pct, 0) / apps.length); };
+  let aba = ler("cg:aba", null);
+  if (!TRILHAS.includes(aba)) aba = (ultimo && ultimo.trilha) || "python";
+  document.getElementById("abas").innerHTML = TRILHAS.map(t => `<button class="aba ${t}" role="tab" id="aba-${t}" aria-controls="trilhas" aria-selected="${t === aba}" tabindex="${t === aba ? 0 : -1}" data-aba="${t}"><b>${NOMES[t]}</b><small>${pctTrilha(t)}% concluído</small></button>`).join("");
+  document.querySelectorAll("[data-aba]").forEach((b, k, todos) => {
+    b.onclick = () => { gravar("cg:aba", b.dataset.aba); render(); document.getElementById("aba-" + b.dataset.aba).focus(); };
+    b.onkeydown = e => { const d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0; if (d){ e.preventDefault(); todos[(k + d + todos.length) % todos.length].click(); } };
+  });
+  const painel = document.getElementById("trilhas");
+  painel.setAttribute("aria-labelledby", "aba-" + aba);
+  painel.innerHTML = [aba].map(t => {
     const apps = APPS.filter(a => a.trilha === t);
-    const feitas = apps.reduce((s, a) => s + P[a.id].pct, 0) / apps.length;
-    return `<section class="trilha ${t}"><header><h2>${NOMES[t]}</h2><span>${Math.round(feitas)}% da trilha</span></header>
+    return `<section class="trilha ${t}"><header><p>${RESUMO[t]} Um curso do zero e três jogos que sobem de nível.</p></header>
       <ol class="paradas">${apps.map(a => {
         const p = P[a.id]; const comecou = p.feitas > 0; const fim = p.feitas >= a.total;
         return `<li class="parada"><div class="marco"><img src="${ICONES[a.id]}" alt=""></div>
