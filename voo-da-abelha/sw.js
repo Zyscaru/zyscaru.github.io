@@ -1,6 +1,6 @@
 /* Guarda o app no aparelho para funcionar sem internet.
    Ao publicar uma atualização, aumente o número da VERSAO. */
-const VERSAO = "voodaabelha-v2";
+const VERSAO = "voodaabelha-v3";
 const ARQUIVOS = [
   "./",
   "index.html",

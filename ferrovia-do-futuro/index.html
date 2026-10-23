@@ -1969,16 +1969,40 @@ window.addEventListener("resize", ()=>{
 /* Navegação comum do Código em Jogo:
    - nos jogos: botão "← (lista)" dentro da missão e o "voltar" do celular volta para a lista de missões;
    - nos cursos: o "voltar" do celular volta para o mapa do curso;
-   - na lista e no mapa: link "← Código em Jogo" para a plataforma. */
+   - em todas as telas: botão "Início" no topo, que volta para a página do Código em Jogo. */
 (function(){
   var css = document.createElement("style");
   css.textContent = ".cj-voltar{display:inline-flex;align-items:center;gap:6px;margin:0 0 12px;padding:6px 14px 6px 10px;border-radius:99px;border:1.5px solid currentColor;background:transparent;color:inherit;font:inherit;font-weight:700;font-size:.86rem;line-height:1.2;cursor:pointer;opacity:.8;min-height:36px}" +
     ".cj-voltar:hover,.cj-voltar:focus-visible{opacity:1}" +
     ".cj-portal{display:inline-flex;align-items:center;gap:6px;margin:0 0 12px;font-weight:700;font-size:.88rem;color:inherit;opacity:.75;text-decoration:none}" +
-    ".cj-portal:hover,.cj-portal:focus-visible{opacity:1;text-decoration:underline}";
+    ".cj-portal:hover,.cj-portal:focus-visible{opacity:1;text-decoration:underline}" +
+    ".cj-inicio{display:inline-flex;align-items:center;gap:6px;text-decoration:none}" +
+    ".cj-inicio svg{width:18px;height:18px;flex:none}" +
+    ".cj-inicio-c{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;padding:6px 12px 6px 9px;border:1.5px solid currentColor;border-radius:99px;font-weight:700;font-size:.82rem;line-height:1.2;color:inherit;text-decoration:none;opacity:.8}" +
+    ".cj-inicio-c:hover,.cj-inicio-c:focus-visible{opacity:1}" +
+    ".cj-inicio-c svg{width:16px;height:16px;flex:none}" +
+    "@media (max-width:600px){.cj-inicio span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.cj-inicio{padding-left:11px!important;padding-right:11px!important}}";
   document.head.appendChild(css);
   var PORTAL = "/";
-  function linkPortal(){ var a = document.createElement("a"); a.className = "cj-portal"; a.href = PORTAL; a.textContent = "← Código em Jogo"; return a; }
+  var CASA = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 9.8V20h13V9.8"/><path d="M10 20v-5.5h4V20"/></svg>';
+  // jogos: botão no cabeçalho, ao lado da lista de missões
+  var topo = document.querySelector(".top-r");
+  if (topo && !topo.querySelector(".cj-inicio")){
+    var a1 = document.createElement("a");
+    a1.className = "btn cj-inicio"; a1.href = PORTAL; a1.title = "Voltar para o Código em Jogo";
+    a1.setAttribute("aria-label", "Início: voltar para o Código em Jogo");
+    a1.innerHTML = CASA + "<span>Início</span>";
+    topo.insertBefore(a1, topo.firstChild);
+  }
+  // cursos: botão no alto da barra lateral (no celular, no alto da página)
+  var trilha = document.querySelector("aside.trail");
+  if (trilha && !trilha.querySelector(".cj-inicio-c")){
+    var a2 = document.createElement("a");
+    a2.className = "cj-inicio-c"; a2.href = PORTAL; a2.title = "Voltar para o Código em Jogo";
+    a2.innerHTML = CASA + "<span>Código em Jogo</span>";
+    trilha.insertBefore(a2, trilha.firstChild);
+  }
+  function linkPortal(){ return document.createComment("início no topo"); }
 
   /* ---------- jogos ---------- */
   if (typeof openLevel === "function" && typeof showLevels === "function"){
