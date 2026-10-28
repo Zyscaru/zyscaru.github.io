@@ -1,6 +1,7 @@
 /* Guarda o app no aparelho para funcionar sem internet.
    Ao publicar uma atualização, aumente o número da VERSAO. */
-const VERSAO = "ferrovia-v3";
+const PREFIXO_CACHE = "ferrovia-";
+const VERSAO = `${PREFIXO_CACHE}v4`;
 const ARQUIVOS = [
   "./",
   "index.html",
@@ -19,7 +20,11 @@ self.addEventListener("install", (e) => {
 self.addEventListener("activate", (e) => {
   e.waitUntil(
     caches.keys()
-      .then((nomes) => Promise.all(nomes.filter((n) => n !== VERSAO && n !== "fontes").map((n) => caches.delete(n))))
+      .then((nomes) => Promise.all(
+        nomes
+          .filter((n) => n.startsWith(PREFIXO_CACHE) && n !== VERSAO)
+          .map((n) => caches.delete(n))
+      ))
       .then(() => self.clients.claim())
   );
 });
