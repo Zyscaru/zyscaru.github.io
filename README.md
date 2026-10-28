@@ -10,3 +10,13 @@ Plataforma para aprender **Python**, **Java**, **JavaScript** e **SQL** jogando.
 | Avançado | [Protocolo Neon](https://zyscaru.github.io/protocolo-neon/) | [Forja Real](https://zyscaru.github.io/forja-real/) | [Estação Kepler](https://zyscaru.github.io/estacao-kepler/) | [Base Amazônia](https://zyscaru.github.io/base-amazonia/) |
 
 Como todos os apps ficam no mesmo endereço (zyscaru.github.io), esta página consegue ler o progresso salvo por cada um no navegador.
+
+## Testes do cache offline
+
+Com Node.js 24 (versão usada na validação), execute na pasta do repositório, sem instalar dependências:
+
+```powershell
+node --test tests/service-worker-cache.test.cjs
+```
+
+Os testes executam os service workers em um ambiente simulado e verificam a limpeza de versões antigas, a preservação dos caches dos outros apps e a leitura offline após ativações em ordens diferentes. A validação em um navegador real é complementar.
