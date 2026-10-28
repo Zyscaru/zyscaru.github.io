@@ -11,12 +11,45 @@ Plataforma para aprender **Python**, **Java**, **JavaScript** e **SQL** jogando.
 
 Como todos os apps ficam no mesmo endereço (zyscaru.github.io), esta página consegue ler o progresso salvo por cada um no navegador.
 
-## Testes do cache offline
+## Organização do projeto
 
-Com Node.js 24 (versão usada na validação), execute na pasta do repositório, sem instalar dependências:
+O portal mantém o visual existente com HTML, CSS e JavaScript em arquivos separados:
 
-```powershell
-node --test tests/service-worker-cache.test.cjs
+```text
+index.html                 Estrutura da página inicial
+assets/css/                Estilos do portal
+assets/js/                 Interface, progresso, persistência e registro da PWA
+assets/images/apps/        Ícones exibidos nos cartões
+dados/apps.js              Catálogo de cursos e jogos
+scripts/                   Verificação e servidor local
+tests/                     Testes automatizados
+docs/                      Contexto e arquitetura do projeto
+sw.js                      Cache offline do portal
 ```
 
-Os testes executam os service workers em um ambiente simulado e verificam a limpeza de versões antigas, a preservação dos caches dos outros apps e a leitura offline após ativações em ordens diferentes. A validação em um navegador real é complementar.
+Cada app de JavaScript e SQL permanece em sua própria pasta, com seus arquivos e cache. Os códigos dos apps Python e Java referenciados no catálogo não estão neste repositório. O código interno dos oito apps ainda não foi separado; essa manutenção pode ser feita por app, preservando as atividades e o progresso.
+
+## Executar e verificar
+
+Use Node.js 24. Não é necessário instalar dependências ou gerar um build:
+
+```powershell
+npm run check
+npm run preview
+```
+
+Se o ambiente tiver apenas o executável Node, os comandos equivalentes são `node scripts/check.mjs` e `node scripts/preview.mjs`. Para executar somente os testes, use `node --test tests/*.test.cjs`.
+
+Abra `http://127.0.0.1:4173`. Encerre o servidor com `Ctrl+C`. O portal usa módulos JavaScript nativos; use a prévia HTTP em vez de abrir o HTML por `file://`.
+
+`npm run check` verifica a estrutura e os links da documentação, além de executar os testes. `npm test` executa somente os testes. Eles verificam o cache offline, os recursos necessários ao portal e a preservação do progresso em armazenamento simulado. A validação em navegador real é complementar.
+
+Ao adicionar ou mover um recurso usado pelo portal, inclua-o em `ARQUIVOS` no `sw.js` e avance sua versão. A publicação continua usando os arquivos da raiz, sem pasta `dist/`; a origem efetiva do GitHub Pages deve ser conferida antes de alterar a hospedagem.
+
+## Documentação e manutenção
+
+- [Contexto, arquitetura e branches](docs/codigo-em-jogo-contexto-e-branches.md): referência canônica para pessoas e assistentes.
+- [Como contribuir](CONTRIBUTING.md): onde editar, como validar e como revisar/enviar alterações.
+- [Instruções para assistentes](AGENTS.md): orientações de entrada para trabalhar no projeto.
+
+Atualize esses documentos no mesmo PR que modificar a estrutura, os comandos ou os contratos de progresso e cache. A documentação acompanha o projeto no Git; não depende de uma cópia privada no computador.
